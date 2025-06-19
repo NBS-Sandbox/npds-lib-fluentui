@@ -2008,6 +2008,16 @@
     "@griffel/react" "^1.5.14"
     "@swc/helpers" "^0.5.1"
 
+"@fluentui/web-components@>=3.0.0-alpha", "@fluentui/web-components@^3.0.0-beta.108":
+  version "3.0.0-beta.108"
+  resolved "https://registry.yarnpkg.com/@fluentui/web-components/-/web-components-3.0.0-beta.108.tgz#2b068be938269d49b959257700ae254f534dd9ed"
+  integrity sha512-J+HJdVKrBWG92Tp/8CsB1m/tf6UOHpnQ7SivI6+J0SuQAkhYImRNpD43b4B6+L5rU/STjBNGlYid3y7+94EMFQ==
+  dependencies:
+    "@fluentui/tokens" "1.0.0-alpha.21"
+    "@microsoft/fast-web-utilities" "^6.0.0"
+    tabbable "^6.2.0"
+    tslib "^2.1.0"
+
 "@gitbeaker/core@^38.12.1":
   version "38.12.1"
   resolved "https://registry.yarnpkg.com/@gitbeaker/core/-/core-38.12.1.tgz#d75d9f829aed9957a75c798d454324285366d0de"
