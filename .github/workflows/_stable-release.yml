@@ -11,14 +11,19 @@ on:
 jobs:
   release-stable:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
 
     steps:
+      # 1) Checkout your stable branch
       - name: Checkout stable branch
         uses: actions/checkout@v4
         with:
           ref: stable
           fetch-depth: 0
 
+      # 2) Setup Node & Yarn
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -26,29 +31,48 @@ jobs:
           registry-url: https://npm.pkg.github.com/
           scope: '@nbs-sandbox'
 
-      - name: Install deps & build
+      - name: Install Yarn v1
+        run: npm install -g yarn@1
+
+      # 3) Install dependencies & build
+      - name: Install & Build Web-Components
         run: |
-          npm install -g yarn@1
           yarn install
           cd packages/web-components
           yarn install
           yarn nx build
-          npm run overlay-styles
 
+      # 4) Checkout your custom-styles repo so overlay-styles can find it
+      - name: Checkout custom-styles repo
+        uses: actions/checkout@v4
+        with:
+          repository: NBS-Sandbox/npds-fluentui-custom-files
+          token: ${{ secrets.CUSTOM_FILES_PAT }}
+          path: packages/web-components/.temp-custom-files
+          ref: main
+
+      # 5) Apply your NPDS CSS overrides
+      - name: Apply Custom NPDS Styling
+        working-directory: packages/web-components
+        run: npm run overlay-styles
+
+      # 6) Bump patch on the stable line
       - name: Bump stable patch
         working-directory: packages/web-components
         run: npm run bump-patch stable
 
+      # 7) Publish as the `latest` dist-tag
       - name: Publish stable as latest
         working-directory: packages/web-components
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm publish
 
+      # 8) Commit the version bump back to `stable`
       - name: Commit version bump
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add packages/web-components/package.json
-          git commit -m "chore: bump stable to $(node -p \"require('./packages/web-components/package.json').version\")"
+          git commit -m "chore(release): bump stable to $(node -p \"require('./packages/web-components/package.json').version\")"
           git push origin stable
